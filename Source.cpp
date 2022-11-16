@@ -10,6 +10,7 @@ int alphaMultiply(int alpha1, int alpha2);
 int alphaExponent(int alpha, int exponent);
 vector<vector<int>> inverseMatrix(vector<vector<int>> m);
 vector<int> findBetas(int sig1, int sig2);
+void printMatrix(vector<vector<int>> m);
 
 vector<vector<int>> addTable =
 {   {15, 4,  8,  14, 1,  10, 13, 9,  2,  7,  5,  12, 11, 6,  3,  0},
@@ -47,7 +48,7 @@ int main() {
 	}
 
 	vector<int> registers = { 15, 15, 15, 15 };
-	vector<int> codeword = {};
+	vector<int> codeWord = {};
 	int feedback = 15;
 	// State Machine Cycles
 	for (int i = 0; i < message.size(); i++) {
@@ -69,16 +70,17 @@ int main() {
 
 	// Push alpha values into correct positions in code word
 	for (int i = 0; i < 4; i++) {
-		codeword.push_back(registers[i]);
+		codeWord.push_back(registers[i]);
 	}
 	for (int i = 10; i >= 0; i--) {
-		codeword.push_back(message[i]);
+		codeWord.push_back(message[i]);
 	}
 
 	// Print out our 15 symbol code word to console
 	cout << "Codeword U(x): " << endl;
-	for (int n : codeword) {
-		cout << n << " ";
+	for (int i = 0; i < codeWord.size(); i++) {
+		if (i == codeWord.size() - 1) cout << codeWord[i];
+		else cout << codeWord[i] << " + ";
 	}
 	cout << endl;
 
@@ -91,12 +93,12 @@ int main() {
 	// cout << "Testing alpha-3: " << vectorMultiplyAlphas(codeword, X, 3) << endl;
 	// cout << "Testing alpha-4: " << vectorMultiplyAlphas(codeword, X, 4) << endl << endl;
 
-	int check1 = vectorMultiplyAlphas(codeword, X, 1);
-	int check2 = vectorMultiplyAlphas(codeword, X, 2);
-	int check3 = vectorMultiplyAlphas(codeword, X, 3);
-	int check4 = vectorMultiplyAlphas(codeword, X, 4);
+	int check1 = vectorMultiplyAlphas(codeWord, X, 1);
+	int check2 = vectorMultiplyAlphas(codeWord, X, 2);
+	int check3 = vectorMultiplyAlphas(codeWord, X, 3);
+	int check4 = vectorMultiplyAlphas(codeWord, X, 4);
 	if (check1 == 15 && check2 == 15 && check3 == 15 && check4 == 15) {
-		cout << "All Clear! You have a valid codeword U(x)." << endl;
+		cout << "All Clear! You have a valid codeword U(x).\n" << endl;
 	}
 	else {
 		return 1;
@@ -142,9 +144,17 @@ int main() {
 	} while (errorA2 < 0 || errorA2 > 14);
 
 	// creation of R(x) which is U(x) + e(x)
-	vector<int> errorCode = codeword;
-	errorCode[errorX1] = alphaAdd(errorA1, codeword[errorX1]);
-	errorCode[errorX2] = alphaAdd(errorA2, codeword[errorX2]);
+	vector<int> errorCode = codeWord;
+	errorCode[errorX1] = alphaAdd(errorA1, codeWord[errorX1]);
+	errorCode[errorX2] = alphaAdd(errorA2, codeWord[errorX2]);
+
+	// Printing R(x)
+	cout << "R(x): " << endl;
+	for (int i = 0; i < errorCode.size(); i++) {
+		if (i == errorCode.size() - 1) cout << errorCode[i];
+		else cout << errorCode[i] << " + ";
+	}
+	cout << endl;
 
 	// Calculation of error syndromes 1 through 4 using R(x)
 	int syn1, syn2, syn3, syn4;
@@ -154,11 +164,11 @@ int main() {
 	syn4 = vectorMultiplyAlphas(errorCode, X, 4);
 
 	// Debug and print out our syndrome values
-	cout << "Syndrome values: \n";
+	cout << "\nSyndrome values:\n";
 	cout << "S1 = " << syn1 << endl;
 	cout << "S2 = " << syn2 << endl;
 	cout << "S3 = " << syn3 << endl;
-	cout << "S4 = " << syn4 << endl;
+	cout << "S4 = " << syn4 << endl << endl;
 
 	// Use syndromes to find location of errors
 	vector<vector<int>> matrix = { {syn1, syn2},
@@ -167,14 +177,13 @@ int main() {
 	// Inverse matrix to use for Sigma1 Sigma2 equation
 	vector<vector<int>> inverse = inverseMatrix(matrix);
 
-	cout << "Inverse Matrix: " << endl;
-	cout << inverse[0][0] << " " << inverse[0][1] << endl;
-	cout << inverse[1][0] << " " << inverse[1][1] << endl;
+	//cout << "Inverse Matrix: " << endl;
+	//printMatrix(inverse);
 
 	int sig1 = alphaAdd(alphaMultiply(inverse[1][0], syn3), alphaMultiply(inverse[1][1], syn4));
 	int sig2 = alphaAdd(alphaMultiply(inverse[0][0], syn3), alphaMultiply(inverse[0][1], syn4));
 
-	cout << "Sig1: " << sig1 << " Sig2: " << sig2 << endl;
+	cout << "Sig1: " << sig1 << " Sig2: " << sig2 << endl << endl;
 
 	vector<int> betas = findBetas(sig1, sig2);
 
@@ -195,24 +204,60 @@ int main() {
 	cout << "Error Locations: " << endl;
 	cout << "location 1: a" << betas[0] << " location 2: a" << betas[1] << endl;
 
+	// Solving for error values to replace in the locations
+	vector<vector<int>> M = { {betas[0], betas[1]},
+		                      {alphaExponent(betas[0], 2), alphaExponent(betas[1], 2)}};
+
+	vector<vector<int>> invM = inverseMatrix(M);
+
+	int error1 = alphaAdd(alphaMultiply(invM[0][0], syn1), alphaMultiply(invM[0][1], syn2));
+	int error2 = alphaAdd(alphaMultiply(invM[1][0], syn1), alphaMultiply(invM[1][1], syn2));
+	cout << "\nError Values:\n" << "a" << error1 << "X" << betas[0] << endl;
+	cout << "a" << error2 << "X" << betas[1] << endl;
+
+	// Add error values back into R(x) to correct R(x) back into U(x)
+	cout << "R(x) before correction: " << endl;
+	for (int i = 0; i < errorCode.size(); i++) {
+		if (i == errorCode.size() - 1) cout << errorCode[i];
+		else cout << errorCode[i] << " + ";
+	}
+	cout << endl << endl;
+
+	cout << "Adding in e'(x) into R(x) to revert to U(x):" << endl;
+	cout << "New R(x) ( == U(x)):" << endl;
+	
+	errorCode[betas[0]] = alphaAdd(error1, errorCode[betas[0]]);
+	errorCode[betas[1]] = alphaAdd(error2, errorCode[betas[1]]);
+
+	for (int i = 0; i < errorCode.size(); i++) {
+		if (i == errorCode.size() - 1) cout << errorCode[i];
+		else cout << errorCode[i] << " + ";
+	}
+	cout << endl << endl;
+
+	cout << "Compare to original codeword message U(x): " << endl;
+	for (int i = 0; i < codeWord.size(); i++) {
+		if (i == codeWord.size() - 1) cout << codeWord[i];
+		else cout << codeWord[i] << " + ";
+	}
+	cout << endl;
+
 	return 0;
 }
 
 vector<vector<int>> inverseMatrix(vector<vector<int>> m) {
-	cout << "Matrix A: " << endl;
-	cout << m[0][0] << " " << m[0][1] << endl;
-	cout << m[1][0] << " " << m[1][1] << endl;
+	//cout << "Matrix: " << endl;
+	//printMatrix(m);
 
 	int determinant = alphaAdd(alphaMultiply(m[0][0], m[1][1]), alphaMultiply(m[0][1], m[1][0]));
 
-	cout << "Determinant: " << determinant << endl;
+	//cout << "Determinant: " << determinant << endl;
 
-	vector<vector<int>> cofactor = { {m[1][1], m[1][0]},
-		                             {m[0][1], m[0][0]} };
+	vector<vector<int>> cofactor = { {m[1][1], m[0][1]},
+		                             {m[1][0], m[0][0]} };
 
-	cout << "Cofactor: " << endl;
-	cout << cofactor[0][0] << " " << cofactor[0][1] << endl;
-	cout << cofactor[1][0] << " " << cofactor[1][1] << endl;
+	//cout << "Cofactor: " << endl;
+	//printMatrix(cofactor);
 
 	vector<vector<int>> inverse = { {15, 15},
 		                            {15, 15} };
@@ -250,6 +295,12 @@ vector<int> findBetas(int sig1, int sig2) {
 	}
 
 	return betas;
+}
+
+void printMatrix(vector<vector<int>> m)
+{
+	cout << m[0][0] << " " << m[0][1] << endl;
+	cout << m[1][0] << " " << m[1][1] << endl;
 }
 
 
