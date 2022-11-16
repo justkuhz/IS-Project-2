@@ -72,6 +72,8 @@ vector<int> findBetas(int sig1, int sig2) {
 			if (betas.size() == 2) break;
 		}
 	}
+
+	// Returns inverse of betas to retrieve true error location
 	if (betas[0] != 0) {
 		betas[0] *= -1;
 		betas[0] += 15;
@@ -109,7 +111,7 @@ int vectorSumAlphas(vector<int> alphas, vector<int> X, int symbol)
 // Alpha addition table, 0 is alpha0 and 15 is true 0. The other numbers represent themselves.
 // EG 10 = alpha10, 5 = alpha5. It is read by using as alpha1 + alpha2 = [alpha1][alpha2] = [row][column].
 vector<vector<int>> addTable =
-{  {15, 4,  8,  14, 1,  10, 13, 9,  2,  7,  5,  12, 11, 6,  3,  0},
+{   {15, 4,  8,  14, 1,  10, 13, 9,  2,  7,  5,  12, 11, 6,  3,  0},
 	{4,  15, 5,  9,  0,  2,  11, 14, 10, 3,  8,  6,  13, 12, 7,  1},
 	{8,  5,  15, 6,  10, 1,  3,  12, 0,  11, 4,  9,  7,  14, 13, 2},
 	{14, 9,  6 , 15, 7,  11, 2,  4,  13, 1,  12, 5,  10, 8,  0,  3},

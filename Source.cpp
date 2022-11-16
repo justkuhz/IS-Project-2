@@ -32,12 +32,11 @@ int main() {
 		registers[1] = alphaAdd(alphaMultiply(feedback, 3), registers[0]);
 		registers[0] = alphaMultiply(feedback, 10);
 
-		/*cout << "Cycle " << i + 1 << ": " << endl;
+		cout << "Cycle " << i + 1 << ": " << endl;
 		cout << "R1: " << registers[0] << " R2: " << registers[1] << " R3: " << registers[2] <<
 			" R4: " << registers[3] << " Feedback: " << feedback << endl;
-			*/
 	}
-	cout << "Registers: " << endl;
+	cout << "\n Final Register Values: " << endl;
 	cout << "R1: " << registers[0] << " R2: " << registers[1] << " R3: " << registers[2] <<
 		" R4: " << registers[3] << endl << endl;
 
@@ -61,10 +60,10 @@ int main() {
 	vector<int> X = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
 
 	// Debugging print statements
-	// cout << "Testing alpha-1: " << vectorMultiplyAlphas(codeword, X, 1) << endl;
-	// cout << "Testing alpha-2: " << vectorMultiplyAlphas(codeword, X, 2) << endl;
-	// cout << "Testing alpha-3: " << vectorMultiplyAlphas(codeword, X, 3) << endl;
-	// cout << "Testing alpha-4: " << vectorMultiplyAlphas(codeword, X, 4) << endl << endl;
+	cout << "Testing alpha-1: " << vectorSumAlphas(codeWord, X, 1) << endl;
+	cout << "Testing alpha-2: " << vectorSumAlphas(codeWord, X, 2) << endl;
+	cout << "Testing alpha-3: " << vectorSumAlphas(codeWord, X, 3) << endl;
+	cout << "Testing alpha-4: " << vectorSumAlphas(codeWord, X, 4) << endl << endl;
 
 	int check1 = vectorSumAlphas(codeWord, X, 1);
 	int check2 = vectorSumAlphas(codeWord, X, 2);
