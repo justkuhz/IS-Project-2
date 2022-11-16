@@ -4,7 +4,14 @@
 #include <vector>
 
 using namespace std;
-
+// Function prototyping, these lines need to be here so the functions can call other functions in this file
+vector<vector<int>> inverseMatrix(vector<vector<int>> m);
+vector<int> findBetas(int sig1, int sig2);
+void printMatrix(vector<vector<int>> m);
+int vectorSumAlphas(vector<int> alphas, vector<int> X, int symbol);
+int alphaAdd(int alpha1, int alpha2);
+int alphaMultiply(int alpha1, int alpha2);
+int alphaExponent(int alpha, int exponent);
 
 /* 
 * This inverseMatrix function takes in a 2x2 matrix and returns the inverse.
